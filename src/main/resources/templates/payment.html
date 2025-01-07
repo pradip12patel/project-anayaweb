@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .payment-form {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+        .form-group .error-message {
+            color: #e74c3c;
+            font-size: 0.9em;
+        }
+        .form-group button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        /* New CSS for product details */
+        .product-details {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .product-details img {
+            max-width: 150px;
+            max-height: 150px;
+            margin-right: 20px;
+            border-radius: 8px;
+        }
+        .product-info {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Payment Gateway From &copy; 2024 Anaya</h1>
+
+    <!-- Product Details Section -->
+    <div class="product-details" id="productDetails">
+        <img id="productImage" src="/images/d1.jpg" alt="Product Image">
+        <div class="product-info">
+            <h3>Product Details</h3>
+            <p><strong>Product Name:</strong> <span id="productName">Loading...</span></p>
+            <p><strong>Price:</strong> <span id="productPrice">0.00</span>Rs</p>
+        </div>
+    </div>
+
+    <div class="payment-form">
+        <form id="paymentForm" action="/paymentsuccess" method="get">
+            <input type="hidden" id="hiddenProductName" name="productName">
+            <input type="hidden" id="hiddenProductPrice" name="productPrice">
+
+            <div class="form-group">
+                <label for="name">Name on Card</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name as per Card " required>
+                <div class="error-message" id="nameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="cardNumber">Card Number</label>
+                <input type="text" id="cardNumber" name="cardNumber" placeholder="Enter your Card Number"  pattern="\d{16}" title="Enter a 16-digit card number without spaces or hyphens" required>
+                <div class="error-message" id="cardNumberError"></div>
+            </div>
+            <div class="form-group">
+                <label for="expiryDate">Expiry Date (MM/YY)</label>
+                <input type="text" id="expiryDate" name="expiryDate" placeholder="Enter your Expiry Date (MM/YY)"  pattern="\d{2}/\d{2}" title="Enter expiry date in MM/YY format" required>
+                <div class="error-message" id="expiryDateError"></div>
+            </div>
+            <div class="form-group">
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" name="cvv" placeholder="Enter your CVV" pattern="\d{3}" title="Enter a 3-digit CVV" required>
+                <div class="error-message" id="cvvError"></div>
+            </div>
+           <div class="form-group">
+              <label for="price">Price</label>
+              <input type="text" id="price" name="price" readonly>
+              <div class="error-message" id="priceError"></div>
+              <p>Payment will be automatically debited from your account</p>
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-primary" onclick="gotopaymentsuccess()">Pay Now</button>
+            </div>
+        </form>
+    </div>
+    
+    
+    
+    <script type="text/javascript">
+    
+    function gotopaymentsuccess() {
+        
+        window.location.href = "/paymentdeatils"; // Redirect to homepage
+        
+    }
+    
+    
+    </script>
+
+    <script>
+    
+        // Function to fetch product details from API
+       // Function to fetch product details from API
+function fetchProductDetails(productId) {
+    console.log("Product ID:", productId); // Debugging: Log the productId
+
+    fetch(`http://localhost:8082/products/retrive/${productId}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to fetch product details');
+        }
+        return response.json();
+    })
+    .then(product => {
+        // Populate product details
+        document.getElementById('productName').textContent = product.name;
+        document.getElementById('productPrice').textContent = product.price.toFixed(2);
+
+        // Set hidden fields for payment form submission
+        document.getElementById('hiddenProductPrice').value = product.price.toFixed(2);
+        document.getElementById('price').value = product.price.toFixed(2); // Set read-only price field
+
+        // Check if the API returns a valid image URL, else use default
+        document.getElementById('productImage').src = product.imageUrl ? product.imageUrl : '/images/d1.jpg'; 
+
+    })
+    .catch(error => {
+        console.error('Error fetching product details:', error);
+        document.getElementById('productDetails').innerHTML = '<p>Error loading product details.</p>';
+    });
+}
+
+// Extract product details from URL query string
+function getProductDetailsFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('productId');
+    const productName = urlParams.get('name');
+    const productPrice = parseFloat(urlParams.get('price')); // Parse the price as a float
+    const productImage = urlParams.get('image'); // Get the image URL from query params
+
+    return {
+        productId,
+        productName,
+        productPrice,
+        productImage
+    };
+}
+
+// Call the function when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    const { productId, productName, productPrice, productImage } = getProductDetailsFromUrl();
+
+    if (productId) {
+        // Set the product name
+        document.getElementById('productName').textContent = productName;
+
+        // Check if the price is a valid number before applying toFixed()
+        if (!isNaN(productPrice)) {
+            document.getElementById('productPrice').textContent = productPrice.toFixed(2);
+            document.getElementById('hiddenProductPrice').value = productPrice.toFixed(2);
+            document.getElementById('price').value = productPrice.toFixed(2); // Ensure it's assigned here as well
+        } else {
+            document.getElementById('productPrice').textContent = 'N/A';
+            console.error('Invalid price value.');
+        }
+
+        // Set the product image, if available
+        if (productImage) {
+            document.getElementById('productImage').src = productImage;
+        } else {
+            document.getElementById('productImage').src = '/images/d1.jpg'; // Default image
+        }
+
+        // Set hidden fields for form submission
+        document.getElementById('hiddenProductName').value = productName;
+    } else {
+        document.getElementById('productDetails').innerHTML = '<p>No product ID found in URL.</p>';
+    }
+});
+
+
+        
+        
+        
+
+        document.getElementById('paymentForm').addEventListener('submit', function(event) {
+            let valid = true;
+            const name = document.getElementById('name');
+            const cardNumber = document.getElementById('cardNumber');
+            const expiryDate = document.getElementById('expiryDate');
+            const cvv = document.getElementById('cvv');
+            
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('cardNumberError').textContent = '';
+            document.getElementById('expiryDateError').textContent = '';
+            document.getElementById('cvvError').textContent = '';
+
+            if (!name.value.trim()) {
+                valid = false;
+                name.classList.add('error');
+                document.getElementById('nameError').textContent = 'Name on card is required.';
+            } else {
+                name.classList.remove('error');
+            }
+
+            if (!cardNumber.checkValidity()) {
+                valid = false;
+                cardNumber.classList.add('error');
+                document.getElementById('cardNumberError').textContent = cardNumber.title;
+            } else {
+                cardNumber.classList.remove('error');
+            }
+
+            if (!expiryDate.checkValidity()) {
+                valid = false;
+                expiryDate.classList.add('error');
+                document.getElementById('expiryDateError').textContent = expiryDate.title;
+            } else {
+                expiryDate.classList.remove('error');
+            }
+
+            if (!cvv.checkValidity()) {
+                valid = false;
+                cvv.classList.add('error');
+                document.getElementById('cvvError').textContent = cvv.title;
+            } else {
+                cvv.classList.remove('error');
+            }
+
+            if (!valid) {
+                event.preventDefault();
+            }
+        });
+    </script>
+    
+     <!-- Footer Section -->
+<footer class="bg-dark text-white py-4">
+    <div class="container">
+        <div class="row">
+            <!-- Column 1: Contact Information -->
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <p><strong>Address:</strong> Dev Complex,District - Rewa, Madhya Pradesh Pincode-486111</p>
+                <p><strong>Phone:</strong> +91 9826242978</p>
+                <p><strong>Email:</strong> info@anaya.com</p>
+            </div>
+
+            <!-- Column 2: Quick Links -->
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="/home" class="text-white">Home</a></li>
+                    <li><a href="/aboutus" class="text-white">About Us</a></li>
+                    <li><a href="/home" class="text-white">Services</a></li>
+                    <li><a href="#" class="text-white">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Social Media -->
+            <div class="col-md-4">
+                <h5>Follow Us</h5>
+                <a href="https://www.facebook.com/login/" class="text-white me-2"><i class="fab fa-facebook"></i> Facebook</a><br>
+                <a href="https://x.com/i/flow/single_sign_on" class="text-white me-2"><i class="fab fa-twitter"></i> Twitter</a><br>
+                <a href="https://www.instagram.com/im_ravi__official/" class="text-white me-2"><i class="fab fa-instagram"></i> Instagram</a><br>
+                <a href="https://www.linkedin.com/in/pradippatel98/" class="text-white me-2"><i class="fab fa-linkedin"></i> LinkedIn</a>
+            </div>
+        </div>
+        <hr class="bg-light">
+        <div class="row">
+            <div class="col text-center">
+                <p class="mb-0">&copy; 2024 Anaya. All Rights Reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

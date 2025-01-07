@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Family Member</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* Main container for the form and ad */
+        .signup-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 30px;
+        }
+
+        /* Ensure the form takes 60% width */
+        .signup-form {
+            flex: 1;
+            margin-right: 20px; /* Add some space between the form and the ad */
+        }
+
+        /* Ad section takes 35% width */
+        .ad-section {
+            flex: 0.35;
+            max-width: 400px; /* Limit the width of the ad section */
+        }
+
+        /* Style for the advertisement section */
+        .advertisement-section {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .advertisement-section img {
+            max-width: 100%; /* Ensure images fit the section */
+            border-radius: 10px;
+        }
+
+        /* Responsive layout for smaller screens */
+        @media (max-width: 1020px) {
+            .signup-container {
+                flex-direction: column;
+            }
+            .ad-section {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+        }
+        
+         /* Floating Effect for Sign Up */
+    .container::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background-color: rgba(0, 123, 255, 0.2);
+        border-radius: 50%;
+        transform: scale(0);
+        transition: transform 0.5s ease-in-out;
+        z-index: 0;
+    }
+
+    /* Activate Floating Effect */
+    .container.active::before {
+        transform: scale(1);
+    }
+
+    /* Keyframes for Fade-In and Zoom-In Effects */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Animation for Sign-In when toggled */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Animation for Sign-Up when toggled */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form.fadeInUp {
+        animation: fadeInUp 0.5s forwards;
+    }
+
+    .form.fadeInDown {
+        animation: fadeInDown 0.5s forwards;
+    }
+    </style>
+</head>
+<body>
+
+<!-- Main container for form and ad -->
+<div class="container">
+    <div class="signup-container">
+        
+        <!-- Form to Update Family Member -->
+        <div class="update-form">
+            <h2>Update Family Member</h2>
+            <form id="updateForm" class="form fadeInDown hidden">
+                <input type="hidden" id="memberId"> <!-- Hidden field for member ID -->
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="age" class="form-label">Age</label>
+                    <input type="number" class="form-control" id="age" required>
+                </div>
+                <div class="mb-3">
+                    <label for="relation" class="form-label">Relation</label>
+                    <input type="text" class="form-control" id="relation" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Save Changes</button>
+            </form>
+        </div>
+        
+        <!-- Advertisement Section -->
+        <div class="advertisement-section ad-section">
+            <h2>Advertisement</h2>
+            <!-- Carousel for Multiple Images in a Single Ad -->
+            <div id="adCarousel" class="carousel slide" data-ride="carousel" data-interval="2000"> 
+                <div class="carousel-inner">
+                    <!-- First Image (Active by Default) -->
+                    <div class="carousel-item active">
+                        <img src="/images/image-url-3.jpg" class="d-block w-100" alt="Ad Image 1">
+                    </div>
+                    <!-- Second Image -->
+                    <div class="carousel-item">
+                        <img src="/images/20200614_095051.jpg" class="d-block w-100" alt="Ad Image 2">
+                    </div>
+                    <!-- Third Image -->
+                    <div class="carousel-item">
+                        <img src="/images/d3.jpg" class="d-block w-100" alt="Ad Image 3">
+                    </div>
+                </div>
+                <!-- Carousel Controls -->
+                <a class="carousel-control-prev" href="#adCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#adCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+            <!-- Ad Description -->
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...</p>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript to load the member data based on the ID passed in the URL -->
+<script>
+    // Function to get query parameter (member ID) from the URL
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Function to fetch the member data and populate the form
+    function loadMemberData() {
+        const memberId = getQueryParam('id');
+        
+        if (memberId) {
+            fetch(`http://localhost:8082/api/family/member/${memberId}`)
+                .then(response => response.json())
+                .then(member => {
+                    document.getElementById('memberId').value = member.id;
+                    document.getElementById('firstName').value = member.firstName;
+                    document.getElementById('lastName').value = member.lastName;
+                    document.getElementById('age').value = member.age;
+                    document.getElementById('relation').value = member.relation;
+                    document.getElementById('email').value = member.email;
+                })
+                .catch(error => console.error('Error fetching member data:', error));
+        }
+    }
+
+    // Call loadMemberData when the page loads
+    document.addEventListener('DOMContentLoaded', loadMemberData);
+
+    
+   // Function to handle form submission and update the member data
+function submitForm() {
+    const memberId = document.getElementById('memberId').value;
+    const updatedData = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        age: document.getElementById('age').value,
+        relation: document.getElementById('relation').value,
+        email: document.getElementById('email').value
+    };
+
+    // Send PUT request to update the family member
+    fetch(`http://localhost:8082/api/family/member/update/${memberId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to update family member');
+        }
+        alert('Family member updated successfully!');
+        // Redirect to homepage to display the updated list
+        window.location.href = '/homepage';
+    })
+    .catch(error => console.error('Error updating member:', error));
+}
+
+</script>
+
+</body>
+</html>

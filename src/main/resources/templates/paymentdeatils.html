@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details</title>
+</head>
+<body>
+
+<div class="container" style="display: flex;">
+    <div>
+        <div class="delivery-info" style="color: rgb(0, 0, 0); font-size: 12px; font-weight: 400;">
+            Free delivery
+        </div>
+    </div>
+    
+    <form action="/success" method="get" id="paymentForm">
+        <!-- Product-related hidden fields -->
+        <input type="hidden" name="product_id" value="{{item['id']}}">
+        <input type="hidden" name="method" value="{{method}}">
+        <input type="hidden" name="address_no" value="{{address['sno']}}">
+        <input type="hidden" name="size" value="{{size}}">
+        <input type="hidden" name="order_id" value="{{payment['id']}}">
+        
+        <script>
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            data-key="rzp_test_t2INvChUAslTpz" <!-- Replace with your test/live key -->
+            data-amount="{{payment['amount']}}" <!-- Amount in paise -->
+            data-currency="{{payment['currency']}}"
+            data-order_id="{{payment['id']}}"
+            data-buttontext="Pay Your Order"
+            data-name="SR Shoppings"
+            data-description="Purchase Transaction"
+            data-image="https://example.com/your_logo.jpg"
+            data-prefill.name="John Doe" <!-- Placeholder name -->
+            data-prefill.email="{{email}}"
+            data-prefill.contact="9999999999"
+            data-theme.color="#F37254"
+        </script>
+    </form>
+</div>
+
+<div id="paymentDetails">
+    <p>Transaction ID: <span id="transactionId">N/A</span></p>
+    <p>Amount: <span id="amount">N/A</span></p>
+    <p>Payment Method: <span id="paymentMethod">N/A</span></p>
+    <p>Date: <span id="date">N/A</span></p>
+</div>
+
+<script>
+    // Function to retrieve payment details from the URL
+    function getPaymentDetailsFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            transactionId: urlParams.get('transactionId'),
+            amount: parseFloat(urlParams.get('amount')),
+            paymentMethod: urlParams.get('paymentMethod'),
+            date: urlParams.get('date')
+        };
+    }
+
+    // Load payment details on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const { transactionId, amount, paymentMethod, date } = getPaymentDetailsFromUrl();
+        document.getElementById('transactionId').textContent = transactionId || 'N/A';
+        document.getElementById('amount').textContent = !isNaN(amount) ? `₹${amount.toFixed(2)}` : 'N/A';
+        document.getElementById('paymentMethod').textContent = paymentMethod || 'N/A';
+        document.getElementById('date').textContent = date || 'N/A';
+    });
+
+    // Function to fetch product data from the server
+    async function fetchProductData(productId) {
+        try {
+            const response = await fetch(`/products/retrieve/${productId}`);
+            if (!response.ok) throw new Error('Product not found');
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching product data:", error);
+            alert("Error fetching product details.");
+        }
+    }
+
+    // Razorpay payment initiation
+    document.getElementById("payButton").addEventListener("click", async function() {
+        const productId = new URLSearchParams(window.location.search).get('productId');
+        if (!productId) {
+            alert("Product ID is missing from the URL.");
+            return;
+        }
+
+        const productData = await fetchProductData(productId);
+        if (!productData) return;
+
+        const amount = Math.round(productData.discountedPrice * 100); // Convert to paise
+        const currency = "INR";
+        const receipt = `receipt#${new Date().getTime()}`;
+
+        const name = document.getElementById("userName").value;
+        const email = document.getElementById("userEmail").value;
+        const contact = document.getElementById("userContact").value;
+
+        if (!name || !email || !contact) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        try {
+            const orderResponse = await fetch("/paymentOrder", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `amount=${amount}&currency=${currency}&receipt=${receipt}`
+            });
+
+            if (!orderResponse.ok) throw new Error("Order creation failed");
+
+            const orderData = await orderResponse.json();
+
+            const options = {
+                "key": "rzp_test_t2INvChUAslTpz",
+                "amount": orderData.amount,
+                "currency": orderData.currency,
+                "name": "SR Shoppings",
+                "description": productData.name,
+                "order_id": orderData.id,
+                "handler": function(response) {
+                    alert("Payment successful!");
+                    window.location.href = `/success?transactionId=${response.razorpay_payment_id}&amount=${amount / 100}&paymentMethod=${currency}&date=${new Date().toLocaleDateString()}`;
+                },
+                "prefill": {
+                    "name": name,
+                    "email": email,
+                    "contact": contact
+                },
+                "theme": { "color": "#3399cc" }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error in order creation or payment.");
+        }
+    });
+</script>
+
+</body>
+</html>

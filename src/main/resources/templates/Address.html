@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Fill in Your Address</h2>
+        <form id="addressForm">
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone" name="phone" required>
+            </div>
+            <div class="mb-3">
+                <label for="street" class="form-label">Street Address</label>
+                <input type="text" class="form-control" id="street" name="street" required>
+            </div>
+            <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text" class="form-control" id="city" name="city" required>
+            </div>
+            <div class="mb-3">
+                <label for="state" class="form-label">State</label>
+                <input type="text" class="form-control" id="state" name="state" required>
+            </div>
+            <div class="mb-3">
+                <label for="zip" class="form-label">Zip Code</label>
+                <input type="text" class="form-control" id="zip" name="zip" required>
+            </div>
+            <div class="mb-3">
+                <label for="country" class="form-label">Country</label>
+                <input type="text" class="form-control" id="country" name="country" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Order</button>
+        </form>
+        <p id="responseMessage" class="mt-3"></p>
+    </div>
+
+    <script>
+        document.getElementById('addressForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from refreshing the page
+
+            // Collect form data
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                street: document.getElementById('street').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                zip: document.getElementById('zip').value,
+                country: document.getElementById('country').value,
+            };
+
+            // Send data to the backend using fetch
+            fetch('http://localhost:8082/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Order submission failed.');
+                }
+                return response.text();
+            })
+            .then(data => {
+                document.getElementById('responseMessage').textContent = 'Order submitted successfully!';
+                document.getElementById('responseMessage').classList.add('text-success');
+            })
+            .catch(error => {
+                document.getElementById('responseMessage').textContent = 'Error submitting order. Please try again.';
+                document.getElementById('responseMessage').classList.add('text-danger');
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>

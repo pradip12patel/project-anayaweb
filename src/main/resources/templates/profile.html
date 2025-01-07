@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Details</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .profile-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 50px;
+        }
+
+        .profile-card h1 {
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .profile-section {
+            margin-bottom: 15px;
+        }
+
+        .profile-section label {
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .profile-edit-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .profile-edit-btn:hover {
+            background-color: #218838;
+        }
+
+        .profile-img {
+            margin-bottom: 20px;
+        }
+
+        .profile-img img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #dee2e6;
+            cursor: pointer;
+        }
+
+        input.form-control {
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+        }
+
+        input.form-control:focus {
+            border-color: #80bdff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center">
+        <div class="profile-card col-md-6">
+            <div class="profile-img text-center">
+                <img src="/images/20200614_095051.jpg" alt="Profile Picture" data-bs-toggle="modal" data-bs-target="#galleryModal">
+            </div>
+
+            <h1 class="text-center">Profile Details</h1>
+
+            <div class="profile-section" style="position: relative;">
+                <label for="profile-name">Name:</label>
+                <input type="text" id="profile-name" class="form-control" readonly style="padding-right: 30px;">
+                <svg onclick="toggleEdit('profile-name')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen edit-icon mt-2" viewBox="0 0 16 16" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;">
+                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
+                </svg>
+            </div>
+            
+            
+            <div class="profile-section" style="position: relative;">
+                <label for="profile-name">Email:</label>
+                <input type="text" id="profile-email" class="form-control" readonly style="padding-right: 30px;">
+                <svg onclick="toggleEdit('profile-email')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen edit-icon mt-2" viewBox="0 0 16 16" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;">
+                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
+                </svg>
+            </div>
+            
+            
+            <div class="profile-section" style="position: relative;">
+                <label for="profile-name">Phone:</label>
+                <input type="text" id="profile-phone" class="form-control" readonly style="padding-right: 30px;">
+                <svg onclick="toggleEdit('profile-phone')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen edit-icon mt-2" viewBox="0 0 16 16" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;">
+                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
+                </svg>
+            </div>
+            
+            
+            <div class="profile-section" style="position: relative;">
+                <label for="profile-name">Address:</label>
+                <input type="text" id="profile-address" class="form-control" readonly style="padding-right: 30px;">
+                <svg onclick="toggleEdit('profile-address')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen edit-icon mt-2" viewBox="0 0 16 16" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;">
+                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
+                </svg>
+            </div>
+
+            <!-- Other profile fields... -->
+
+            <div class="text-center">
+                <a href="/homepage" class="profile-edit-btn">Save Changes</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Gallery -->
+    <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="galleryModalLabel">Profile Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="/images/20200614_095051.jpg" alt="Profile Picture" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleEdit(id) {
+            const input = document.getElementById(id);
+            if (input.hasAttribute('readonly')) {
+                input.removeAttribute('readonly');
+                input.focus();
+            } else {
+                input.setAttribute('readonly', 'readonly');
+            }
+        }
+
+        function loadProfileDetails() {
+            const profile = JSON.parse(localStorage.getItem('profile')) || {};
+            document.getElementById('profile-name').value = profile.name || '';
+            document.getElementById('profile-email').value = profile.email || '';
+            document.getElementById('profile-phone').value = profile.phone || '';
+            document.getElementById('profile-address').value = profile.address || '';
+        }
+
+        // Save profile updates
+        function saveProfile() {
+            const profile = {
+                name: document.getElementById('profile-name').value,
+                email: document.getElementById('profile-email').value,
+                phone: document.getElementById('profile-phone').value,
+                address: document.getElementById('profile-address').value
+            };
+            localStorage.setItem('profile', JSON.stringify(profile));
+            alert('Profile updated successfully!');
+        }
+
+        // Load profile details when the page loads
+        window.onload = loadProfileDetails;
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

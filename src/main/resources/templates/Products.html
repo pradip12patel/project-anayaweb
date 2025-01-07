@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Products</title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Add your CSS here -->
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Include the navigation bar -->
+    <div th:replace="header :: header"></div>
+    <div th:insert="~{header :: header}"></div>
+
+    <div class="container">
+        <h1>Product Listing</h1>
+        <div class="row">
+            <div class="col-md-4" th:each="product : ${products}">
+                <div class="card">
+                    <img th:src="@{/images/default-product.jpg}" class="card-img-top" alt="Product Image">
+                    <div class="card-body">
+                        <h5 th:text="${product.name}" class="card-title"></h5>
+                        <p th:text="${product.description}" class="card-text"></p>
+                        <p class="card-price">
+                            <span th:text="${product.originalPrice}" class="original-price">$</span>
+                            <span th:text="${product.discountedPrice}" class="discounted-price">$</span>
+                            <span th:text="'(' + ${product.discountPercentage} + '% off)'"></span>
+                        </p>
+                        <a href="#" class="btn btn-primary">Buy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

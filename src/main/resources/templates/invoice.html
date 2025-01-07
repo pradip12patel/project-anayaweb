@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+        .invoice-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .invoice-header h1 {
+            color: #4CAF50;
+            margin: 0;
+        }
+        .invoice-header .date-time {
+            text-align: right;
+            font-size: 0.9em;
+            color: #888;
+        }
+        .invoice-header .logo {
+            max-width: 150px;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        .invoice-details h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .invoice-details p {
+            margin: 5px 0;
+        }
+        .signature {
+            margin-top: 30px;
+            text-align: right;
+        }
+        .signature img {
+            max-width: 150px;
+            height: auto;
+        }
+        .btn {
+            display: block;
+            width: 90%;
+            height: 70%;
+            text-align: center;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .download-btn {
+            background-color: #007BFF;
+        }
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <!-- Company Logo -->
+            <img src="/images/mart.jpg" alt="Company Logo" class="logo"> <!-- Replace with actual logo path -->
+            <div>
+                <h1>Payment Invoice</h1>
+                <p>Thank you for your purchase!</p>
+                <!-- Display current date and time -->
+                <div class="date-time" id="dateTime"></div>
+            </div>
+        </div>
+        <div class="invoice-details" id="invoiceDetails">
+            <!-- Payment details will be populated here -->
+        </div>
+        
+       
+        <div class="signature">
+            <p>Manager</p>
+            <img src="/images/sign.jpg" alt="Manager's Signature"> <!-- Replace with actual signature image path -->
+        </div>
+       
+        <a href="javascript:void(0)" class="btn download-btn" id="downloadBtn">Download Invoice</a>
+        <a href="/homepage" class="btn">Back to Home</a>
+
+        
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Function to retrieve query parameters from the URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                payment_id: params.get('payment_id'),
+                order_id: params.get('order_id'),
+                product_id: params.get('product_id'),
+            };
+        }
+
+        // Function to fetch payment details from the backend and display them
+        function fetchPaymentDetails() {
+            const { payment_id, order_id, product_id } = getQueryParams();
+
+            if (!payment_id || !order_id || !product_id) {
+                document.getElementById('invoiceDetails').innerHTML = '<p>Error: Missing payment details in URL.</p>';
+                return;
+            }
+
+            // Fetch payment details from the server
+            fetch(`http://localhost:8082/paymentOrder/${product_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('invoiceDetails').innerHTML = `
+                            <h2>Invoice</h2>
+                            <p><strong>Product Name:</strong> ${data.response.name}</p>
+                            <p><strong>Payment ID:</strong> ${data.response.paymentId}</p>
+                            <p><strong>Order ID:</strong> ${data.response.orderId}</p>
+                            <p><strong>Product ID:</strong> ${data.response.productId}</p>
+                            <p><strong>Status:</strong> ${data.response.status}</p>
+                            <p><strong>Amount:</strong> ₹${(data.response.original).toFixed(2)}</p>
+                        `;
+                    } else {
+                        document.getElementById('invoiceDetails').innerHTML = `<p>${data.response}</p>`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('invoiceDetails').innerHTML = `<p>Error fetching payment details: ${error.message}</p>`;
+                });
+        }
+
+        // Function to generate PDF and trigger the download
+        function downloadInvoice() {
+            const invoiceDetails = document.getElementById('invoiceDetails').innerText;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text('Payment Invoice', 14, 20);
+            doc.text(invoiceDetails, 14, 30);
+            doc.save('invoice.pdf');
+        }
+
+        // Function to display current date and time with seconds
+        function displayCurrentDateTime() {
+            const dateTimeElement = document.getElementById('dateTime');
+            const now = new Date();
+            const formattedDate = now.toLocaleString(); // Format the date and time
+            dateTimeElement.textContent = `Generated on: ${formattedDate}`;
+        }
+
+        // Call fetchPaymentDetails function when the page loads
+        window.onload = function() {
+            fetchPaymentDetails();
+            displayCurrentDateTime(); // Display current date and time
+        };
+
+        // Event listener for the download button
+        document.getElementById('downloadBtn').addEventListener('click', downloadInvoice);
+    </script>
+</body>
+</html>

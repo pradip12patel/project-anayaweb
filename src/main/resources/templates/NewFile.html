@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In / Sign Up</title>
+
+    <style>
+    /* Reset basic styles */
+    * {
+        margin: 2;
+        padding: 2;
+        box-sizing: border-box;
+    }
+
+    /* Body Styling */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #e9ecef;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* Floating Container */
+    .container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+        max-width: 400px;
+        width: 100%;
+        transition: all 0.3s ease-in-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-container {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Toggle buttons */
+    .toggle-container {
+        display: flex;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .toggle-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+    }
+
+    .toggle-btn.active {
+        background-color: #007bff;
+        color: green;
+    }
+
+    /* Form Styling */
+    .form {
+        display: none;
+        flex-direction: column;
+        animation: fadeIn 0.4s forwards;
+        transform-origin: top;
+        opacity: 0;
+    }
+
+    .form.active {
+        display: flex;
+        opacity: 1;
+        transform: scale(1);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    input {
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    button[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 50px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* Floating Effect for Sign Up */
+    .container::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background-color: rgba(0, 123, 255, 0.2);
+        border-radius: 50%;
+        transform: scale(0);
+        transition: transform 0.5s ease-in-out;
+        z-index: 0;
+    }
+
+    /* Activate Floating Effect */
+    .container.active::before {
+        transform: scale(1);
+    }
+
+    /* Keyframes for Fade-In and Zoom-In Effects */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Animation for Sign-In when toggled */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Animation for Sign-Up when toggled */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form.fadeInUp {
+        animation: fadeInUp 0.5s forwards;
+    }
+
+    .form.fadeInDown {
+        animation: fadeInDown 0.5s forwards;
+    }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <!-- Toggle buttons -->
+            <div class="toggle-container">
+                <button id="signInToggle" class="toggle-btn active">Sign In</button>
+                <button id="signUpToggle" class="toggle-btn">Sign Up</button>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signInForm" class="form fadeInDown hidden">
+                <h2>Sign In</h2>
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit">Sign In</button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signUpForm" class="form fadeInDown hidden">
+                <h2>Sign Up</h2>
+                <input type="text" placeholder="First Name" required>
+                <input type="text" placeholder="Last Name" required>
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <input type="password" placeholder="Confirm Password" required>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const signInToggle = document.getElementById("signInToggle");
+        const signUpToggle = document.getElementById("signUpToggle");
+        const signInForm = document.getElementById("signInForm");
+        const signUpForm = document.getElementById("signUpForm");
+        const container = document.querySelector('.container');
+
+        // Toggle between Sign In and Sign Up forms
+        signInToggle.addEventListener("click", () => {
+            signInForm.classList.add("active", "fadeInUp");
+            signUpForm.classList.remove("active", "fadeInDown");
+            signInToggle.classList.add("active");
+            signUpToggle.classList.remove("active");
+            container.classList.remove('active');
+        });
+
+        signUpToggle.addEventListener("click", () => {
+            signUpForm.classList.add("active", "fadeInDown");
+            signInForm.classList.remove("active", "fadeInUp");
+            signUpToggle.classList.add("active");
+            signInToggle.classList.remove("active");
+            container.classList.add('active');
+        });
+    </script>
+</body>
+</html>
