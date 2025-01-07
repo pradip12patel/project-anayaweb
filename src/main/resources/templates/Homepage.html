@@ -302,7 +302,7 @@
             align-items: center;
             justify-content: center;
             border: 1px solid #fff; /* Optional: white border for better visibility */
-            mt-3;
+            margin-top:3;
         } 
         
         .search-container {
@@ -373,8 +373,43 @@
             height: 100%;
             fill: rgba(255, 255, 255, 0.5); 
         }
-                  
 
+        .search-results-container {
+    margin-top: 20px; /* Adds 20px gap above the results */
+    padding: 10px; /* Optional, adds padding inside the container */
+}
+
+.suggestions-container {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            z-index: 10;
+            margin-top: 5px;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .search-results-container {
+            margin-top: 20px;
+        }
+
+        .result-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+        }
+
+      
     </style>
     
 </head>
@@ -399,20 +434,19 @@
             </p>
                   
             
-      <nav class="navbar bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand text-left text-white mb-0"></a>
-            <form class="d-flex search-container" role="search" id="searchForm">
-                <input class="form-control me-2 custom-search-input" type="search" placeholder="Search for products..." aria-label="Search" id="searchInput">
-                <i class="fas fa-search floating-search-icon"></i> <!-- Search Icon -->
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-        </div>
-    </nav>
+            <nav class="navbar bg-body-tertiary">
+                <div class="container-fluid">
+                    <a class="navbar-brand text-left text-white mb-0"></a>
+                    <form class="d-flex search-container" role="search" id="searchForm">
+                        <input class="form-control me-2 custom-search-input" type="search" placeholder="Search for products..." aria-label="Search" id="searchInput" oninput="showSuggestions()">
+                        <i class="fas fa-search floating-search-icon"></i> <!-- Search Icon -->
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                    <div id="suggestions" class="suggestions-container"></div>
+                </div>
+            </nav>
+           
 
-
-
-                
                 
                 
 <div class="text-center">
@@ -501,6 +535,16 @@
         </div>
     </div>
                
+
+   
+
+    
+        <div id="searhprodut" class="search-results-container">
+            <!-- Search results will be dynamically added here -->
+        </div>
+   
+    
+
 <!-- Row for Logo and Description -->
 <header class="bg-primary text-white header-lg py-4">
     <div class="container">
@@ -520,7 +564,7 @@
     </div>
 </header>
 
-	<div id="searhprodut"></div>
+	
 <!-- Carousel for Image Slides -->
     <div id="carouselExampleDark" class="carousel carousel-dark slide" data-ride="carousel" data-interval="2000"> 
     <div class="carousel-indicators">
@@ -873,51 +917,145 @@
         
     </script>
 
- <div class="row mt-4" id="searchResults">
+ <div class="row margin-top:4" id="searchResults">
         <!-- Product cards will be injected here dynamically -->
     </div>
 
+    <!-- <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const query = document.getElementById('searchInput').value;
+        
+            // Perform a fetch request to search for products
+            fetch(`http://localhost:8082/products/search?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('searhprodut');
+                    resultsDiv.innerHTML = ''; // Clear previous results
+        
+                    if (data.length > 0) {
+                        data.forEach(product => {
+                            resultsDiv.innerHTML += `
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <img src="${product.imageUrl || '/images/default.jpg'}" class="card-img-top" alt="${product.name}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${product.name}</h5>
+                                            <p class="card-text">${product.description}</p>
+                                            <p class="card-price">
+                                                <span class="original-price">${product.originalPrice ? product.originalPrice.toFixed(2) : ''} Rs</span>
+                                                <span class="discounted-price">${product.discountedPrice ? product.discountedPrice.toFixed(2) : ''} Rs</span>
+                                                <span class="discount-percentage">${product.discountPercentage ? product.discountPercentage : ''}% Off</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        resultsDiv.innerHTML = '<p>No products found.</p>';
+                    }
+                })
+                .catch(error => console.error('Error fetching products:', error));
+        });
+        </script> -->
 
-<script>
-document.getElementById('searchForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const query = document.getElementById('searchInput').value;
+        <script>
+            // Function to handle suggestions
+            function showSuggestions() {
+                const query = document.getElementById('searchInput').value;
+        
+                // If the query is empty, clear suggestions
+                if (!query) {
+                    document.getElementById('suggestions').innerHTML = '';
+                    return;
+                }
+        
+                // Fetch suggestions from the backend
+                fetch(`http://localhost:8082/api/products/suggest?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const suggestionsDiv = document.getElementById('suggestions');
+                        suggestionsDiv.innerHTML = ''; // Clear previous suggestions
+        
+                        if (data.length > 0) {
+                            data.forEach(suggestion => {
+                                const div = document.createElement('div');
+                                div.classList.add('suggestion-item');
+                                div.textContent = suggestion;
+                                div.onclick = () => {
+                                    document.getElementById('searchInput').value = suggestion;
+                                    suggestionsDiv.innerHTML = ''; // Clear suggestions after selection
+                                    performSearch(); // Automatically perform search with selected suggestion
+                                };
+                                suggestionsDiv.appendChild(div);
+                            });
+                        } else {
+                            suggestionsDiv.innerHTML = '<p>No suggestions found.</p>';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching suggestions:', error));
+            }
+        
+            // Function to perform the search
+            function performSearch(event) {
+                if (event) event.preventDefault(); // Prevent form submission if triggered by submit
+        
+                const query = document.getElementById('searchInput').value;
+        
+                // Fetch search results from the backend
+                fetch(`http://localhost:8082/products/search?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultsDiv = document.getElementById('searhprodut');
+                        resultsDiv.innerHTML = ''; // Clear previous results
+        
+                        if (data.length > 0) {
+                    data.forEach((product, index) => {
+                        if (index % 3 === 0) {
+                            // Create a new row every 3 products
+                            resultsDiv.innerHTML += '<div class="row"></div>';
+                        }
 
-    // Perform a fetch request to search for products
-    fetch(`http://localhost:8082/products/search?query=${query}`)
-        .then(response => response.json())
-        .then(data => {
-            const resultsDiv = document.getElementById('searhprodut');
-            resultsDiv.innerHTML = ''; // Clear previous results
-
-            if (data.length > 0) {
-                data.forEach(product => {
-                    resultsDiv.innerHTML += `
-                        <div class="col-md-4 mb-3">
-                            <div class="card">
-                                <img src="${product.imageUrl || '/images/default.jpg'}" class="card-img-top" alt="${product.name}">
-                                <div class="card-body">
-                                    <h5 class="card-title">${product.name}</h5>
-                                    <p class="card-text">${product.description}</p>
-                                    <p class="card-price">
-                                        <span class="original-price">${product.originalPrice ? product.originalPrice.toFixed(2) : ''} Rs</span>
-                                        <span class="discounted-price">${product.discountedPrice ? product.discountedPrice.toFixed(2) : ''} Rs</span>
-                                        <span class="discount-percentage">${product.discountPercentage ? product.discountPercentage : ''}% Off</span>
-                                    </p>
+                        // Append each product to the current row
+                        const row = resultsDiv.querySelector('.row:last-child');
+                        row.innerHTML += `
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <img src="${product.imageUrl || '/images/default.jpg'}" class="card-img-top" alt="${product.name}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${product.name}</h5>
+                                        <p class="card-text">${product.description}</p>
+                                        <p class="card-price">
+                                            <span class="original-price">${product.originalPrice ? product.originalPrice.toFixed(2) : ''} Rs</span>
+                                            <span class="discounted-price">${product.discountedPrice ? product.discountedPrice.toFixed(2) : ''} Rs</span>
+                                            <span class="discount-percentage">${product.discountPercentage ? product.discountPercentage : ''}% Off</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                });
-            } else {
-                resultsDiv.innerHTML = '<p>No products found.</p>';
+                        `;
+                    });
+                }
+                else {
+                            resultsDiv.innerHTML = '<p>No products found.</p>';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching products:', error));
             }
-        })
-        .catch(error => console.error('Error fetching products:', error));
-});
-</script>
-  
-
+        
+            // Attach event listeners after DOM is loaded
+            document.addEventListener('DOMContentLoaded', function() {
+                // Add listener for form submit (to trigger search)
+                document.getElementById('searchForm').addEventListener('submit', function(event) {
+                    performSearch(event);
+                });
+        
+                // Add listener for input event to show suggestions
+                document.getElementById('searchInput').addEventListener('input', showSuggestions);
+            });
+        </script>
+        
 <footer class="bg-dark text-white py-4">
     <div class="container">
         <div class="row">
