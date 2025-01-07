@@ -3,7 +3,6 @@ package Springboot_Service;
 import java.util.List;
 import java.util.Optional;
 
-
 import Springboot_Model.Product;
 
 
@@ -27,6 +26,8 @@ public interface ProductService {
 	    Optional<Product> findById(long id);
 
 	    Product save(Product product);
+
+		// List<Product> getSuggestions(String query);
 	   
 	
 	

@@ -379,25 +379,33 @@
     padding: 10px; /* Optional, adds padding inside the container */
 }
 
-.suggestions-container {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ccc;
-            max-height: 200px;
-            overflow-y: auto;
-            width: 100%;
-            z-index: 10;
-            margin-top: 5px;
-        }
+ /* Styling for the suggestions container */
+ #suggestions {
+        position: absolute;
+        background-color: white; /* Background for the dropdown */
+        border: 1px solid #ccc; /* Border around suggestions */
+        border-radius: 5px; /* Rounded corners */
+        width: 100%; /* Full width of the input field */
+        max-height: 200px; /* Limit height */
+        overflow-y: auto; /* Enable scrolling for long lists */
+        z-index: 1000; /* Ensure it appears above other elements */
+        top: 100%; /* Position below the input field */
+        left: 0;
+    }
 
-        .suggestion-item {
-            padding: 10px;
-            cursor: pointer;
-        }
+    /* Styling for each suggestion item */
+    .suggestion-item {
+        padding: 10px;
+        cursor: pointer;
+        color: #333; /* Default text color */
+        font-size: 14px;
+    }
 
-        .suggestion-item:hover {
-            background-color: #f1f1f1;
-        }
+    /* Change background and text color on hover */
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+        color: #007bff; /* Change text color on hover */
+    }
 
         .search-results-container {
             margin-top: 20px;
@@ -961,50 +969,27 @@
         </script> -->
 
         <script>
-            // Function to handle suggestions
-            function showSuggestions() {
-                const query = document.getElementById('searchInput').value;
-        
-                // If the query is empty, clear suggestions
-                if (!query) {
-                    document.getElementById('suggestions').innerHTML = '';
-                    return;
-                }
-        
-                // Fetch suggestions from the backend
-                fetch(`http://localhost:8082/api/products/suggest?query=${query}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const suggestionsDiv = document.getElementById('suggestions');
-                        suggestionsDiv.innerHTML = ''; // Clear previous suggestions
-        
-                        if (data.length > 0) {
-                            data.forEach(suggestion => {
-                                const div = document.createElement('div');
-                                div.classList.add('suggestion-item');
-                                div.textContent = suggestion;
-                                div.onclick = () => {
-                                    document.getElementById('searchInput').value = suggestion;
-                                    suggestionsDiv.innerHTML = ''; // Clear suggestions after selection
-                                    performSearch(); // Automatically perform search with selected suggestion
-                                };
-                                suggestionsDiv.appendChild(div);
-                            });
-                        } else {
-                            suggestionsDiv.innerHTML = '<p>No suggestions found.</p>';
-                        }
-                    })
-                    .catch(error => console.error('Error fetching suggestions:', error));
-            }
-        
-            // Function to perform the search
-            function performSearch(event) {
+
+             // Function to perform the search
+             function performSearch(event) {
                 if (event) event.preventDefault(); // Prevent form submission if triggered by submit
         
                 const query = document.getElementById('searchInput').value;
+
+
+    // Dynamically update search URL based on query
+    const searchUrl = `http://localhost:8082`;
+
+    const url2 = new URL(`${searchUrl}/products/api/products/suggest`);
+    url2.searchParams.set('query', query); // Add query parameter to URL
         
                 // Fetch search results from the backend
-                fetch(`http://localhost:8082/products/search?query=${query}`)
+                fetch(url2, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
                     .then(response => response.json())
                     .then(data => {
                         const resultsDiv = document.getElementById('searhprodut');
@@ -1054,7 +1039,62 @@
                 // Add listener for input event to show suggestions
                 document.getElementById('searchInput').addEventListener('input', showSuggestions);
             });
-        </script>
+
+            const BASE_URL = 'http://localhost:8082';
+            // Function to handle suggestions
+            function showSuggestions() {
+                const queryInput = document.getElementById('searchInput').value;
+        
+                // If the query is empty, clear suggestions
+                if (!queryInput) {
+                    document.getElementById('suggestions').innerHTML = '';
+                    return;
+                }
+        
+                const url = new URL(`${BASE_URL}/products/api/products/suggest`);
+                url.searchParams.append('query', queryInput);
+
+
+               // Fetch suggestions from the backend
+fetch(url, {
+    method: 'GET', 
+    headers: {
+        'Content-Type': 'application/json', // Specify the content type
+    }
+})
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const suggestionsDiv = document.getElementById('suggestions');
+        suggestionsDiv.innerHTML = ''; // Clear previous suggestions
+
+        if (data.length > 0) {
+            data.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.classList.add('suggestion-item');
+
+                const suggestionText = typeof suggestion === 'object' ? suggestion.name : suggestion;
+                    div.textContent = suggestionText;
+
+                    div.onclick = () => {
+                        document.getElementById('searchInput').value = suggestionText;
+                        suggestionsDiv.innerHTML = '';
+                        performSearch();
+                    };
+
+                    suggestionsDiv.appendChild(div);
+            });
+        } else {
+            suggestionsDiv.innerHTML = '<p>No suggestions found.</p>';
+        }
+    })
+    .catch(error => console.error('Error fetching suggestions:', error));
+      } 
+ </script>
         
 <footer class="bg-dark text-white py-4">
     <div class="container">

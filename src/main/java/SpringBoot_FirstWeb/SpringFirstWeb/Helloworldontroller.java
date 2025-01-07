@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import Springboot_Service.ProductService;
+import Springboot_Model.Product;
 
 
 
@@ -32,6 +34,14 @@ import org.springframework.web.servlet.ModelAndView;
 public class Helloworldontroller {
 	
 
+    // private ProductService productservice;
+
+    
+	// public Helloworldontroller(ProductService productservice) {
+	// 	super();
+	// 	this.productservice = productservice;
+		
+	// } 
 	
 	@GetMapping("/hello")
 	public String helloworld(Model model)  {
@@ -353,7 +363,6 @@ public ResponseEntity<?> verifyCode(@RequestParam String phoneNumber, @RequestPa
     }
 }
             */
-
 
 
 

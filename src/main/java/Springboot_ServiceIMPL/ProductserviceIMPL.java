@@ -128,7 +128,14 @@ public class ProductserviceIMPL implements ProductService {
 	    }
 
        
-	    
+	   
+// 		// Method to get product suggestions based on query
+// 	@Override
+//    public List<Product> getSuggestions(String query) {
+// 	return productrepo.findByNameContainingIgnoreCase(query);
+	
+// }
+
 	    
 
    
