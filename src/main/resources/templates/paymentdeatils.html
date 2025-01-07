@@ -22,21 +22,22 @@
         <input type="hidden" name="size" value="{{size}}">
         <input type="hidden" name="order_id" value="{{payment['id']}}">
         
-        <script>
-            src="https://checkout.razorpay.com/v1/checkout.js"
-            data-key="rzp_test_t2INvChUAslTpz" <!-- Replace with your test/live key -->
-            data-amount="{{payment['amount']}}" <!-- Amount in paise -->
-            data-currency="{{payment['currency']}}"
-            data-order_id="{{payment['id']}}"
-            data-buttontext="Pay Your Order"
-            data-name="SR Shoppings"
-            data-description="Purchase Transaction"
-            data-image="https://example.com/your_logo.jpg"
-            data-prefill.name="John Doe" <!-- Placeholder name -->
-            data-prefill.email="{{email}}"
-            data-prefill.contact="9999999999"
-            data-theme.color="#F37254"
-        </script>
+        <script></script>
+    src="https://checkout.razorpay.com/v1/checkout.js"
+    data-key="rzp_test_t2INvChUAslTpz" <!-- Replace with your test/live key -->
+    data-amount="{{ payment['amount'] }}" <!-- Amount in paise -->
+    data-currency="{{ payment['currency'] }}"
+    data-order_id="{{ payment['id'] }}"
+    data-buttontext="Pay Your Order"
+    data-name="SR Shoppings"
+    data-description="Purchase Transaction"
+    data-image="https://example.com/your_logo.jpg"
+    data-prefill.name="John Doe"
+    data-prefill.email="{{ email }}"
+    data-prefill.contact="9999999999"
+    data-theme.color="#F37254"
+     </script>
+
     </form>
 </div>
 
